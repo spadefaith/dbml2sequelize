@@ -20,18 +20,18 @@ const parsed = parseDbml(
     updatedAt: "modified_dt",
   }
 );
-// sequelize.sync({ force: true }).then(() => {
-//   console.log("done");
+sequelize.sync({ force: true }).then(() => {
+  console.log("done");
 
-//   const auto = new SequelizeAuto(sequelize, null, null, {
-//     ...opts,
-//     directory: path.join(__dirname, "models"),
-//     lang: "ts",
-//     caseModel: "p",
-//     caseFile: "p",
-//   });
+  const auto = new SequelizeAuto(sequelize, null, null, {
+    ...opts,
+    directory: path.join(__dirname, "models"),
+    lang: "ts",
+    caseModel: "p",
+    caseFile: "p",
+  });
 
-//   auto.run().then(() => {
-//     console.log("done");
-//   });
-// });
+  auto.run().then(() => {
+    console.log("done");
+  });
+});
