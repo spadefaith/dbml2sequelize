@@ -1,9 +1,14 @@
-module.exports = function convertAttributes(attributes, sequelize, DataTypes) {
-  return attributes.reduce((accu, iter) => {
+module.exports = function convertAttributes(
+  tblName,
+  attributes,
+  sequelize,
+  DataTypes
+) {
+  const attrs = attributes.reduce((accu, iter) => {
     const name = Object.keys(iter)[0];
     const conf = iter[name];
 
-    // console.log(6, conf);
+    conf.tblName = tblName;
 
     const callbacks = [
       convertVarChar,
@@ -11,6 +16,11 @@ module.exports = function convertAttributes(attributes, sequelize, DataTypes) {
       convertTimestamp,
       convertString,
       convertNote,
+      convertText,
+      convertBoolean,
+      convertDate,
+      convertDateOnly,
+      convertDecimal,
     ];
 
     for (let i = 0; i < callbacks.length; i++) {
@@ -22,27 +32,35 @@ module.exports = function convertAttributes(attributes, sequelize, DataTypes) {
           ...conf,
           ...converted,
         };
-        // break;
+        break;
       }
     }
     return accu;
   }, {});
+
+  return attrs;
 };
 
-function convertVarChar({ type, defaultValue }, sequelize, DataTypes) {
+function convertVarChar(conf, sequelize, DataTypes) {
+  const { type } = conf;
   if (type.includes("varchar")) {
-    return { type: DataTypes.STRING };
+    if (type.includes("(") && type.includes(")")) {
+      const size = type.match(/\(([^)]+)\)/)[1];
+      return { type: DataTypes.STRING(size) };
+    } else {
+      return { type: DataTypes.STRING };
+    }
   }
 }
 
 function convertInteger({ type, defaultValue }, sequelize, DataTypes) {
-  if (type.includes("integer")) {
+  if (type == "integer") {
     return { type: DataTypes.INTEGER };
   }
 }
 
 function convertTimestamp({ type, defaultValue }, sequelize, DataTypes) {
-  if (type.includes("timestamp")) {
+  if (type == "timestamp") {
     if (defaultValue.includes("now()")) {
       return {
         type: DataTypes.DATE,
@@ -57,7 +75,7 @@ function convertTimestamp({ type, defaultValue }, sequelize, DataTypes) {
 }
 
 function convertString({ type, defaultValue }, sequelize, DataTypes) {
-  if (type.includes("string")) {
+  if (type == "string") {
     return { type: DataTypes.STRING };
   }
 }
@@ -67,5 +85,46 @@ function convertNote(conf, sequelize, DataTypes) {
     const note = conf.note;
     delete conf.note;
     return { comment: note.replaceAll("'", "") };
+  }
+}
+
+function convertText({ type }, sequelize, DataTypes) {
+  if (type.includes("text")) {
+    if (type.includes("(") && type.includes(")")) {
+      const size = type.match(/\(([^)]+)\)/)[1];
+      return { type: DataTypes.TEXT(size) };
+    } else {
+      return { type: DataTypes.TEXT };
+    }
+  }
+}
+
+function convertBoolean(conf, sequelize, DataTypes) {
+  if (conf.type == "boolean") {
+    return { type: DataTypes.BOOLEAN };
+  }
+}
+
+function convertDate(conf, sequelize, DataTypes) {
+  if (conf.type == "date") {
+    return { type: DataTypes.DATE };
+  }
+}
+
+function convertDateOnly(conf, sequelize, DataTypes) {
+  if (conf.type == "dateonly") {
+    return { type: DataTypes.DATEONLY };
+  }
+}
+
+function convertDecimal({ type }, sequelize, DataTypes) {
+  if (type.includes("decimal")) {
+    if (type.includes("(") && type.includes(")")) {
+      const size = type.match(/\(([^)]+)\)/)[1];
+      const [precision, scale] = size.split(",");
+      return { type: DataTypes.DECIMAL(parseInt(precision), parseInt(scale)) };
+    } else {
+      return { type: DataTypes.DECIMAL };
+    }
   }
 }

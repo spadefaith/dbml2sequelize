@@ -80,7 +80,12 @@ module.exports = (sequelize, DataTypes, srcPath, opts) => {
 
     const indexes = convertIndexes(settings);
     const comment = tableDef.comment || convertNote(settings);
-    const attrs = convertAttributes(tableDef.attributes, sequelize, DataTypes);
+    const attrs = convertAttributes(
+      tableDef.name,
+      tableDef.attributes,
+      sequelize,
+      DataTypes
+    );
 
     return sequelize.define(tableDef.name, attrs, {
       ...opts,

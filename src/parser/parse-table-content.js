@@ -46,6 +46,9 @@ module.exports = function parseTableContent(line, settingList) {
   const colDef = {};
   let [columnName, dataType, ...settings] = line.split(" ");
 
+  columnName = columnName.trim();
+  dataType = dataType.trim();
+
   if (columnName == "Note:") {
     let [columnName, comment] = line.split(":");
     colDef.comment = comment;
