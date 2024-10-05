@@ -23,6 +23,9 @@ function parseSettings({ settings }) {
   if (settings["primary key"] || settings.pk) {
     data.primaryKey = true;
   }
+  if (settings.unique) {
+    data.unique = true;
+  }
 
   if (settings.increment) {
     data.autoIncrement = true;
