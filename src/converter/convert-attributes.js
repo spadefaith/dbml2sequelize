@@ -61,16 +61,16 @@ function convertInteger({ type, defaultValue }, sequelize, DataTypes) {
 
 function convertTimestamp({ type, defaultValue }, sequelize, DataTypes) {
   if (type == "timestamp") {
-    if (defaultValue.includes("now()")) {
-      return {
-        type: DataTypes.DATE,
-        defaultValue: sequelize.fn("now"),
-      };
-    } else {
-      return {
-        type: DataTypes.DATE,
-      };
+    let o = {
+      type: DataTypes.DATE,
     }
+    if (defaultValue.includes("now()")) {
+      o.defaultValue = sequelize.fn("now");
+    } else if (defaultValue.includes("CURRENT_TIMESTAMP")) {
+      o.defaultValue = sequelize.literal("CURRENT_TIMESTAMP");
+    }
+
+    return o;
   }
 }
 
