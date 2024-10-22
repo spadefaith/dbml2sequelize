@@ -22,6 +22,8 @@ module.exports = (sequelize, DataTypes, srcPath, opts) => {
     "default",
     "increment",
     "ref",
+    "delete",
+    "update"
   ];
   const specsNames = [
     "Table",

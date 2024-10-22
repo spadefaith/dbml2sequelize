@@ -23,6 +23,16 @@ function parseSettings({ settings }) {
   if (settings["primary key"] || settings.pk) {
     data.primaryKey = true;
   }
+
+
+  if (settings.delete) {
+    data.onDelete = settings.delete.toUpperCase();
+  }
+
+  if (settings.update) {
+    data.onUpdate = settings.update.toUpperCase();
+  }
+
   if (settings.unique) {
     data.unique = true;
   }
