@@ -89,11 +89,13 @@ module.exports = (sequelize, DataTypes, srcPath, opts) => {
       DataTypes
     );
 
-    return sequelize.define(tableDef.name, attrs, {
+    const model = sequelize.define(tableDef.name, attrs, {
       ...opts,
       indexes,
       comment,
     });
+
+    return model;
   });
   return json;
 };

@@ -26,11 +26,13 @@ function parseSettings({ settings }) {
 
 
   if (settings.delete) {
-    data.onDelete = settings.delete.toUpperCase();
+    // data.references.onDelete = settings.delete.toLowerCase();
+    data.onDelete = String(settings.delete).toLowerCase();
   }
 
   if (settings.update) {
-    data.onUpdate = settings.update.toUpperCase();
+    // data.references.onUpdate = settings.update.toUpperCase();
+    data.onUpdate = String(settings.update).toLowerCase();
   }
 
   if (settings.unique) {
