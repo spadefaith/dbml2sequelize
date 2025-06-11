@@ -64,10 +64,13 @@ function convertTimestamp({ type, defaultValue }, sequelize, DataTypes) {
     let o = {
       type: DataTypes.DATE,
     }
-    if (defaultValue.includes("now()")) {
-      o.defaultValue = sequelize.fn("now");
-    } else if (defaultValue.includes("CURRENT_TIMESTAMP")) {
-      o.defaultValue = sequelize.literal("CURRENT_TIMESTAMP");
+
+    if (defaultValue) {
+      if (defaultValue.includes("now()")) {
+        o.defaultValue = sequelize.fn("now");
+      } else if (defaultValue.includes("CURRENT_TIMESTAMP")) {
+        o.defaultValue = sequelize.literal("CURRENT_TIMESTAMP");
+      }
     }
 
     return o;
