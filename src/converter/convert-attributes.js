@@ -11,11 +11,12 @@ module.exports = function convertAttributes(
     conf.tblName = tblName;
 
     const callbacks = [
+      convertNote,
+      convertEnum,
       convertVarChar,
       convertInteger,
       convertTimestamp,
       convertString,
-      convertNote,
       convertText,
       convertBoolean,
       convertDate,
@@ -41,9 +42,24 @@ module.exports = function convertAttributes(
   return attrs;
 };
 
+function convertEnum(conf, sequelize, DataTypes) {
+  const { type } = conf;
+  if (type?.includes("enum")) {
+    if (type.includes("(") && type.includes(")")) {
+      const enumsText = type.match(/\(([^)]+)\)/)[1];
+
+      const enums = enumsText.split(",").map(e => e.trim().replace(/'/g, "")).filter(Boolean);
+      if (enums.length == 0) throw new Error(`Enum type must have at least one value`)
+      return { type: DataTypes.ENUM(...enums) };
+    } else {
+      throw new Error(`Enum type must have values defined`);
+    }
+  }
+}
+
 function convertVarChar(conf, sequelize, DataTypes) {
   const { type } = conf;
-  if (type.includes("varchar")) {
+  if (type?.includes("varchar")) {
     if (type.includes("(") && type.includes(")")) {
       const size = type.match(/\(([^)]+)\)/)[1];
       return { type: DataTypes.STRING(size) };
@@ -84,10 +100,10 @@ function convertString({ type, defaultValue }, sequelize, DataTypes) {
 }
 
 function convertNote(conf, sequelize, DataTypes) {
-  if (conf.note) {
+  if (conf?.note) {
     const note = conf.note;
     delete conf.note;
-    return { comment: note.replaceAll("'", "") };
+    conf.comment = note.replaceAll("'", "");
   }
 }
 
@@ -115,7 +131,7 @@ function convertDate(conf, sequelize, DataTypes) {
 }
 
 function convertDateOnly(conf, sequelize, DataTypes) {
-  if (conf.type == "dateonly") {
+  if (conf?.type == "dateonly") {
     return { type: DataTypes.DATEONLY };
   }
 }

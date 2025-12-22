@@ -55,9 +55,11 @@ module.exports = function parseFieldSettings(settings, settingList = []) {
     if (isDef) {
       let [d, v] = iter.split(":");
       d = d.trim();
-      v = v.trim();
+      v = v.trim().replace("(comma)", ",");
 
-      settingList.includes(d) && (accu[d] = v.replace("(comma)", ","));
+      if (settingList.includes(d) && v) {
+        accu[d] = v;
+      }
     } else {
       settingList.includes(iter) && (accu[iter] = true);
     }

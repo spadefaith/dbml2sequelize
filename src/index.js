@@ -10,7 +10,7 @@ const convertAttributes = require("./converter/convert-attributes");
 const convertIndexes = require("./converter/convert-indexes");
 const convertNote = require("./converter/convert-note");
 module.exports = (sequelize, DataTypes, srcPath, opts) => {
-  const tableDefSettings = ["indexes", "Note"];
+  const tableDefSettings = ["indexes", "Note:"];
   const indexSettingsList = ["type", "name", "unique", "pk", "note"];
   const tableSettingsList = [
     "note",
@@ -29,10 +29,11 @@ module.exports = (sequelize, DataTypes, srcPath, opts) => {
     "Table",
     "Project",
     "indexes",
-    "enum",
+    // "enum",
     "TableGroup",
-    "Note",
+    "Note:",
   ];
+  const dataTypesWithComma = ["enum", "varchar", "text", "decimal"];
 
   const read = fs.readFileSync(srcPath, "utf8");
   const definitions = grouping(read);
@@ -46,7 +47,7 @@ module.exports = (sequelize, DataTypes, srcPath, opts) => {
       let comment = "";
 
       const attributes = content.reduce((accu, line) => {
-        const parsedContent = parseTableContent(line, tableSettingsList);
+        const parsedContent = parseTableContent(line, tableSettingsList, dataTypesWithComma);
 
         if (parsedContent.comment) {
           comment = parsedContent.comment;
