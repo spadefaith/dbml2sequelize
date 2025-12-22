@@ -118,14 +118,18 @@ function getDataType(line, dataTypesWithComma) {
   let [, dataType] = line.split(" ");
 
   let isDataTypeWithComma = false;
+  let hasParen = false;
   for (const dt of dataTypesWithComma) {
     if (dataType.startsWith(dt)) {
       isDataTypeWithComma = true;
+
+      hasParen = dataType.startsWith(dt + "(");
+
       break;
     }
   }
 
-  if (isDataTypeWithComma) {
+  if (isDataTypeWithComma && hasParen) {
     dataType = line.substring(line.indexOf(" ") + 1, line.indexOf(")")).trim() + ")";
   }
 
