@@ -57,9 +57,11 @@ function parseSettings({ settings }) {
   return data;
 }
 
-module.exports = function parseTableContent(line, settingList) {
+module.exports = function parseTableContent(line, settingList, dataTypesWithComma = []) {
   const colDef = {};
   let [columnName, dataType, ...settings] = line.split(" ");
+  dataType = getDataType(line, dataTypesWithComma);
+  settings = getSettings(line, dataTypesWithComma);
 
   columnName = columnName.trim();
   dataType = dataType.trim();
@@ -68,7 +70,6 @@ module.exports = function parseTableContent(line, settingList) {
     let [columnName, comment] = line.split(":");
     colDef.comment = comment;
   } else if (settings) {
-    settings = settings.join(" ");
     const parsedSettings = parseSettings(
       parseFieldSettings(settings, settingList)
     );
@@ -81,8 +82,52 @@ module.exports = function parseTableContent(line, settingList) {
       colDef[columnName].type = dataType;
     }
   } else {
-    colDef[columnName] = dataType;
+    colDef[columnName] = { type: dataType };
   }
 
   return colDef;
 };
+
+function getSettings(line, dataTypesWithComma) {
+  let [, ...rem] = line.split(" ");
+
+  rem = rem.join(" ");
+
+  let settings = "";
+  let isDataTypeWithComma = false;
+  for (const dt of dataTypesWithComma) {
+    if (rem.startsWith(dt)) {
+      isDataTypeWithComma = true;
+      break;
+    }
+  }
+
+  if (isDataTypeWithComma) {
+    settings = line.substring(line.indexOf(")") + 1, line.length).trim();
+  } else {
+    let firstSpaceIdx = rem.indexOf(" ");
+    if (firstSpaceIdx > -1) {
+      settings = rem.substring(firstSpaceIdx + 1, rem.length).trim();
+    }
+  }
+
+  return settings;
+}
+
+function getDataType(line, dataTypesWithComma) {
+  let [, dataType] = line.split(" ");
+
+  let isDataTypeWithComma = false;
+  for (const dt of dataTypesWithComma) {
+    if (dataType.startsWith(dt)) {
+      isDataTypeWithComma = true;
+      break;
+    }
+  }
+
+  if (isDataTypeWithComma) {
+    dataType = line.substring(line.indexOf(" ") + 1, line.indexOf(")")).trim() + ")";
+  }
+
+  return dataType;
+}

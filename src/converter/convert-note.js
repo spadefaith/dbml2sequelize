@@ -1,7 +1,9 @@
 module.exports = function convertNote(settings) {
   const indexConf = settings.find((setting) => setting.type == "Note");
 
-  return indexConf && indexConf?.content
+  const note = indexConf && indexConf?.content
     ? indexConf.content.replaceAll("'", "")
     : "";
+
+  return note;
 };
